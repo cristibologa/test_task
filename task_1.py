@@ -296,19 +296,17 @@ Exemplu: task_13('hello', 'world') ➞ False
 
 
 def task_13(*arg):
-    print(arg)
-    arr = list(arg)
-    print(arr)
-    first = arr[0]
-    second = arr[1]
-    if (sorted(first) == sorted(second)):
-        return True
-    else:
-        return False
-# CODUL TĂU VINE MAI SUS:
+    # arr = list(arg)
+    # first = arr[0]
+    # second = arr[1]
+    # if (sorted(first) == sorted(second)):
+    #     return True
+    # else:
+    #     return False
+    # CODUL TĂU VINE MAI SUS:
+    pass
 
-
-# VERIFICATION PROCESS
+    # VERIFICATION PROCESS
 print(session.check_task_13(task_13))
 # VERIFICATION PROCESS
 
@@ -321,8 +319,10 @@ Exemplu: task_14('home', 'same', 'meme', sub_string="me") ➞ ['home', 'meme', '
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_14():
-    pass
+def task_14(*arg, **kwarg):
+    value = kwarg.get('sub_string')
+    res = [i for i in arg if value in i]
+    return res
 # CODUL TĂU VINE MAI SUS:
 
 
@@ -340,8 +340,14 @@ Exemplu: task_15('home', 'same', 'meme', sub_string = 'me') ➞ {'contains': ['h
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_15():
-    pass
+def task_15(*arg, **kwarg):
+    value = kwarg.get('sub_string')
+    # contains = [i for i in arg if value in i]
+    # not_conatis = [i for i in arg if not value in i]
+    # res = {'contains': contains, 'not_contains': not_conatis}
+    res = {'contains': [i for i in arg if value in i],
+           'not_contains': [i for i in arg if not value in i]}
+    return res
 # CODUL TĂU VINE MAI SUS:
 
 
@@ -362,8 +368,44 @@ Exemplu: task_16(2, 3, 4, 5, operation='div') ➞ 0.008333333333333333
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_16():
-    pass
+def task_16(*arg, **kwarg):
+    value = kwarg.get('operation')
+    arr = list(arg)
+
+    def add(arr):
+        res = 0
+        for i in arr:
+            res += i
+        return res
+
+    def sub(arr):
+        res = arr[0]
+        for i in range(len(arr)):
+            if i < len(arr)-1:
+                res = res - arr[i+1]
+        return res
+
+    def mul(arr):
+        res = 1
+        for i in arr:
+            res *= i
+        return res
+
+    def div(arr):
+        res = arr[0]
+        for i in range(len(arr)):
+            if i < len(arr)-1:
+                res = res / arr[i+1]
+        return res
+
+    if value == 'add':
+        add(arr)
+    if value == 'sub':
+        sub(arr)
+    if value == 'mul':
+        mul(arr)
+    if value == "div":
+        div(arr)
 # CODUL TĂU VINE MAI SUS:
 
 
@@ -402,8 +444,15 @@ Exemplu: task_18('hello', 'world') ➞ {'h': 1, 'e': 1, 'l': 3, 'o': 2, 'w': 1, 
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_18():
-    pass
+def task_18(*args):
+    character_counts = {}
+    for arg in args:
+        for char in arg:
+            if char in character_counts:
+                character_counts[char] += 1
+            else:
+                character_counts[char] = 1
+    return character_counts
 # CODUL TĂU VINE MAI SUS:
 
 
@@ -419,8 +468,23 @@ Exemplu: task_19(1, 2, 3, 4, 5, 6, 7, 8, 9) ➞ {2: 1, 3: 1, 5: 1, 7: 1}
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_19():
-    pass
+def task_19(*args):
+    def is_prime(n):
+        if n < 2:
+            return False
+        for i in range(2, int(n**0.5) + 1):
+            if n % i == 0:
+                return False
+        return True
+
+    prime_counts = {}
+    for num in args:
+        if is_prime(num):
+            if num in prime_counts:
+                prime_counts[num] += 1
+            else:
+                prime_counts[num] = 1
+    return prime_counts
 # CODUL TĂU VINE MAI SUS:
 
 
