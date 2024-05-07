@@ -1,512 +1,198 @@
-from sigmoid_check.python_odyssey.lesson_11.lesson_11 import Lesson11
+# Aceasta este sarcina pentru lecția despre conceptele avansate ale programării orientate pe obiecte în Python, cum ar fi super() și self, getter/setter și property, privatizarea și tipurile de metode.
 
-# Această temă pentru acasă necesită instalarea librăriei `sigmoid_check` cu versiunea cel puțin 0.0.4
+from sigmoid_check.python_odyssey.lesson_14.lesson_14 import Lesson14
+
+# Această temă pentru acasă necesită instalarea librăriei `sigmoid_check` cu versiunea cel puțin 0.0.7
 # Pentru a instala această librărie, rulați următorul cod în terminal:
-# pip install sigmoid_check==0.0.4
+# pip install sigmoid_check==0.0.7
 
 # VERIFICATION PROCESS
-session = Lesson11()
+session = Lesson14()
 # VERIFICATION PROCESS
 
 """
-Task: Creați o funcție cu numele `task_1` care poate primi un număr variabil de argumente și returnează suma acestora.
-Exemplu: task_1(1, 2, 3) ➞ 6
+ISTORIA DIN SPATE:
+O companie de tehnologie, TechSolutions, are nevoie de ajutorul nostru pentru a îmbunătăți gestionarea software-ului lor intern. 
+Ei doresc să optimizeze modul în care tratează datele utilizatorilor și setările de sistem, 
+respectând principiile OOP avansate pentru a asigura securitatea și modularitatea codului.
+"""
+
+"""
+Pentru început vrem să asigurăm 3 tipuri de utilizatori în baza de date a companiei noastre.
+Tipurile de utilizatori sunt:
+1. Utilizator default - utilizatorul obișnuit care nu va avea careva drepturi de acces și va putea să utilizeze sistemul intern într-un mod limitat
+2. Utilizator manager - utilizatorul care va avea drepturi de acces mai mari decât utilizatorul default și va putea să modifice setările de sistem, 
+                        însă va avea restricții în ceea ce privește modificarea datelor utilizatorilor, 
+                        fiind capabil doar să citească informația și nu să o modifice
+3. Utilizator admin - utilizatorul care va avea toate drepturile de acces și va putea să modifice atât setările de sistem, cât și datele utilizatorilor
+
+Iar din cauza faptului că nu dorim să replicăm aceleași metode de inițializare a utilizatorilor pentru fiecare tip de utilizator,
+vrem să creăm o clasă de bază care să conțină metodele comune pentru toți utilizatorii și să moștenească aceste metode către clasele specifice tipurilor de utilizatori.
+
+Ce trebuie să faci:
+1. Creează o clasă `Utilizator` care să conțină un atribut public `nume` și un atribut protejat `_nivel_acces` cu valoarea implicită "Default".
+    Clasa `Utilizator` trebuie să conțină metoda `afiseaza_nivel_acces` care să returneze string-ul "*nume-utilizator* are nivelul de acces *nivel-acces*.".
+    De asemenea, clasa `Utilizator` trebuie să conțină metoda `utilizeaza_sistem` care să returneze string-ul "*nume-utilizator* poate utiliza funcții de bază ale sistemului.".
+
+2. Creează o clasă `UtilizatorManager` care să moștenească clasa `Utilizator` și să aibă atributul protejat `_nivel_acces` cu valoarea "Manager".
+    Clasa `UtilizatorManager` trebuie să conțină metoda `modifica_setari` care să returneze string-ul "*nume-utilizator* poate modifica setările sistemului.".
+    De asemenea, clasa `UtilizatorManager` trebuie să conțină metoda `citeste_date_utilizator` care să returneze string-ul "*nume-utilizator* poate citi datele utilizatorilor.".
+
+3. Creează o clasă `UtilizatorAdmin` care să moștenească clasa `Utilizator` și să aibă atributul protejat `_nivel_acces` cu valoarea "Admin".
+    Clasa `UtilizatorAdmin` trebuie să conțină metoda `modifica_setari` care să returneze string-ul "*nume-utilizator* poate modifica setările sistemului.".
+    De asemenea, clasa `UtilizatorAdmin` trebuie să conțină metoda `modifica_date_utilizator` care să returneze string-ul "*nume-utilizator* poate modifica datele utilizatorilor.".
 """
 
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_1(*numere):
-    suma = 0
-    for i in numere:
-        suma += i
-    return suma
+class Utilizator:
+    def __init__(self, nume):
+        self.nume = nume
+        self._nivel_acces = "Default"
+
+    def afiseaza_nivel_acces(self):
+        return f"{self.nume}are nivelul de acces {self._nivel_acces}."
+
+    def utilizeaza_sistem(self):
+        return f"{self.nume} poate utiliza funcții de bază ale sistemului."
+
+
+class UtilizatorManager(Utilizator):
+
+    def __init__(self, nume):
+        super().__init__(nume)
+        self._nivel_acces = "Manager"
+
+    def modifica_setari(self):
+        return f"{self.nume} poate modifica setările sistemului."
+
+    def citeste_date_utilizator(self):
+        return f"{self.nume} poate citi datele utilizatorilor."
+
+
+class UtilizatorAdmin(Utilizator):
+    def __init__(self, nume):
+        super().__init__(nume)
+        self._nivel_acces = "Admin"
+
+    def modifica_setari(self):
+        return f"{self.nume} poate modifica setările sistemului."
+
+    def modifica_date_utilizator(self):
+        return f"{self.nume} poate modifica datele utilizatorilor."
+
+
 # CODUL TĂU VINE MAI SUS:
 
 
 # VERIFICATION PROCESS
-print(session.check_task_1(task_1))
+print(session.check_task_1(Utilizator, UtilizatorManager, UtilizatorAdmin))
 # VERIFICATION PROCESS
 
-
 """
-Task: Creați o funcție cu numele `task_2` care primește un număr variabil de argumente și returnează o listă cu argumentele care sunt numere întregi.
-Exemplu: task_2(1, 2, 'a', 'b') ➞ [1, 2]
+Acum că am creat clasele de utilizatori, mai avem nevoie de însăși sistemul la care acești utilizatori vor avea acces.
+Sistemul va conține o clasă `Sistem` care va conține o listă de utilizatori și metode pentru a adăuga utilizatori noi, a afișa utilizatorii existenți și a verifica nivelul de acces al unui utilizator.
+La sistem va avea acces doar Utilizatorii Admin așa că trebuie să ne asigurăm că aceștia vor avea metode pentru a adăuga, a modificare și a șterge datele private ale sistemului.
+
+Ce trebuie să faci:
+1. Pentru această sarcină vom crea o copie a clasei `Utilizator` de mai sus, deoarece vom avea nevoie de aceeași structură pentru a adăuga utilizatorii în sistem.
+   Creează o clasă `user` care să conțină un atribut privat `_nume` și un atribut protejat `__nivel_acces` cu valoarea implicită "Default".
+   Acum avem nevoie de un getter și un setter pentru atributul `_nume` și `__nivel_acces` pentru a putea modifica aceste valori în afara clasei.
+
+2. Creează o clasă `Sistem` care va conține un atribut privat `__utilizatori` inițializat cu un dicționar gol în care cheile vor fi id-ul și valorile utilizatorii.
+    Clasa `Sistem` trebuie să conțină metoda `adauga_utilizator` care va primi un obiect de tip `Utilizator` și va adăuga utilizatorul la dicționar împreună cu un nou id.
+    De asemenea, clasa `Sistem` trebuie să conțină metoda `afiseaza_utilizatori` care va returna o listă cu numele utilizatorilor existenți.
+    Clasa `Sistem` trebuie să conțină metoda `verifica_nivel_acces` care va primi numele unui utilizator și va returna nivelul de acces al utilizatorului respectiv.
+    Clasa `Sistem` trebuie să conțină și metoda `modifica_name_user` care va primi id-ul utilizatorului și noul nume al utilizatorului și va modifica numele utilizatorului respectiv.
+    Clasa `Sistem` trebuie să conțină și metoda `sterge_utilizator` care va primi id-ul utilizatorului și va șterge utilizatorul respectiv.
+    Clasa `Sistem` trebuie să conțină și metoda `modifica_nivel_acces` care va primi id-ul utilizatorului și noul nivel de acces al utilizatorului și va modifica nivelul de acces al utilizatorului respectiv.
 """
 
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_2(*arguments):
-    return [i for i in arguments if type(i) == int]
-# CODUL TĂU VINE MAI SUS:
+class user:
+    def __init__(self, nume):
+        self._nume = nume
+        self.__nivel_acces = "Default2"
+
+    @property
+    def nume(self):
+        return self._nume
+
+    @nume.setter
+    def nume(self, valoare):
+        self._nume = valoare
+
+    @property
+    def nivel_acces(self):
+        return self.__nivel_acces
+
+    @nivel_acces.setter
+    def nivel_acces(self, valoare):
+        self.__nivel_acces = valoare
 
 
-# VERIFICATION PROCESS
-print(session.check_task_2(task_2))
-# VERIFICATION PROCESS
+class Sistem:
+    def __init__(self):
+        self.__utilizatori = {}
 
-"""
-Task: Creați o funcție cu numele `task_3` care poate primi un număr variabil de argumente și va returna produsul acesora.
-Exemplu: task_3(1, 4, 5) ➞ 20
-"""
+    def adauga_utilizator(self, utilizator):
+        # Generăm un id unic pentru utilizator
+        id_utilizator = len(self.__utilizatori) + 1
+        self.__utilizatori[id_utilizator] = utilizator
 
-# CODUL TĂU VINE MAI JOS:
+    def afiseaza_utilizatori(self):
+        return [utilizator.get_nume() for utilizator in self.__utilizatori.values()]
 
+    def verifica_nivel_acces(self, nume_utilizator):
+        for utilizator in self.__utilizatori.values():
+            if utilizator.get_nume() == nume_utilizator:
+                return utilizator.get_nivel_acces()
+        return "Utilizatorul nu există"
 
-def task_3(*numere):
-    suma = 1
-    for i in numere:
-        suma *= i
-    return suma
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_3(task_3))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_4` care primește un număr arbitrar de perechi cheie-valoare și returnează un string care conține toate cheile și valorile concatenate separate de un spațiu.
-Exemplu: task_4(a=1, b=2, c=3) ➞ 'a 1 b 2 c 3'
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_4(**kwargs):
-    arr = []
-    for key, value in kwargs.items():
-        arr.append(key)
-        arr.append(value)
-    listToStr = ' '.join([str(elem) for elem in arr])
-    return listToStr
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_4(task_4))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_5` care primește un număr variabil de argumente și returnează două liste separate.
-Prima listă conține toate argumentele de tip întreg sortate în ordine crescătoare, iar a doua listă conține denumirea tuturor argumentelor keyword care sunt de tip string sortate în ordine alfabetică.
-Exemplu: task_6(3, 1, 2, a=10, b=20) ➞ [1, 2, 3], []
-Exemplu: task_6(3, 1, 2, a=10, b=20, c='a') ➞ [1, 2, 3], ['c']
-Exemplu: task_6(3, 1, 2, a=10, b=20, c='a', d='b') ➞ [1, 2, 3], ['c', 'd']
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_5(*arg, **karg):
-    arr_karg = []
-    list_of_arg = list(arg)
-    list_of_arg.sort()
-    for key, value in karg.items():
-        if type(value) == str:
-            arr_karg.append(key)
-    arr_karg.sort()
-    return list_of_arg, arr_karg
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_5(task_5))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_6` care primește un număr variabil de argumente și returnează un dicționar care conține toate argumentele keyword ca key și valoarea acestora ca value.
-Exemplu: task_6(a=1, b=2, c=3) ➞ {'a': 1, 'b': 2, 'c': 3}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_6(**karg):
-    return {i: j for i, j in karg.items()}
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_6(task_6))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_7` care poate primi un număr nedeterminat de argumente atât string-uri cât și numere și va returna un dicționar cu două chei: `str` și `int`.
-Cheia `str` va avea o listă cu toate string-urile primite ca argumente, iar cheia `int` va avea o listă cu toate numerele primite ca argumente.
-Exemplu: task_7(1, 'a', 2, 'b') ➞ {'str': ['a', 'b'], 'int': [1, 2]}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_7(*arg):
-    list_int = []
-    list_str = []
-    for i in arg:
-        if type(i) == int:
-            list_int.append(i)
+    def modifica_nume_utilizator(self, id_utilizator, nume_nou):
+        if id_utilizator in self.__utilizatori:
+            self.__utilizatori[id_utilizator].set_nume(nume_nou)
         else:
-            list_str.append(i)
-    dic = {'str': list_str, 'int': list_int}
-    return dic
-# CODUL TĂU VINE MAI SUS:
+            print("Utilizatorul nu există")
 
-
-# VERIFICATION PROCESS
-print(session.check_task_7(task_7))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_8` care primește un număr variabil de argumente și returnează un dicționar cu două chei: `palindrom` și `non_palindrom`.
-Cheia `palindrom` va avea o listă cu toate argumentele care sunt palindroame, iar cheia `non_palindrom` va avea o listă cu toate argumentele care nu sunt palindroame.
-Exemplu: task_8('madam', 'hello', 'level', 'world') ➞ {'palindrom': ['madam', 'level'], 'non_palindrom': ['hello', 'world']}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_8(*arg):
-    palindrom = []
-    non_palindrom = []
-    for i in arg:
-        if i == i[::-1]:
-            palindrom.append(i)
+    def sterge_utilizator(self, id_utilizator):
+        if id_utilizator in self.__utilizatori:
+            del self.__utilizatori[id_utilizator]
         else:
-            non_palindrom.append(i)
-    dic = {'palindrom': palindrom, 'non_palindrom': non_palindrom}
-    return dic
-# CODUL TĂU VINE MAI SUS:
+            print("Utilizatorul nu există")
 
-
-# VERIFICATION PROCESS
-print(session.check_task_8(task_8))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_9` care primește un număr variabil de argumente de tip integer și un argument `number` de tip integer.
-Funcția va returna toate argumentele care sunt multipli ai lui `number`.
-Exemplu: task_9(1, 2, 3, 4, 5, number=2) ➞ [2, 4]
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_9(*arg, **karg):
-    arr = []
-    value = karg.get('number')
-    for i in arg:
-        if i % value == 0:
-            arr.append(i)
-    return arr
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_9(task_9))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_10` care primește un număr variabil de argumente de tip integer și un argument `number` de tip integer.
-Funcția va returna toate argumentele care sunt divizibile cu `number`.
-Exemplu: task_10(1, 2, 3, 4, 5, number=2) ➞ [2, 4]
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_10(*arg, **karg):
-    arr = []
-    value = karg.get('number')
-    for i in arg:
-        if i % value == 0:
-            arr.append(i)
-    return arr
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_10(task_10))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_11` care primește un număr variabil de argumente de tip integer care reprezintă șirul Fibonacci.
-Funcția va returna valoarea True dacă șirul Fibonacci este corect și False în caz contrar.
-Exemplu: task_11(1, 1, 2, 3, 5, 8) ➞ True
-Exemplu: task_11(1, 1, 2, 3, 5, 9) ➞ False
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_11(*arg):
-    arr = list(arg)
-    n = len(arr)
-    if n < 2:
-        return False
-    for i in range(2, n):
-        if arr[i] != arr[i - 1] + arr[i - 2]:
-            return False
-
-    return True
-
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_11(task_11))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_12` care primește un număr variabil de argumente de tip integer.
-Funcția va returna True dacă toate argumentele sunt numere prime și False în caz contrar.
-Exemplu: task_12(2, 3, 5, 7) ➞ True
-Exemplu: task_12(1, 2, 3, 4) ➞ False
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_12(*arg):
-    if len(arg) < 1:
-        return False
-    for num in arg:
-        if num <= 1:
-            return False
-        for i in range(2, num):
-            if (num % i) == 0:
-                return False
-        return True
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_12(task_12))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_13` care primește obligatoriu un argument de tip string și un număr variabil de argumente de tip string.
-Funcția va returna True dacă toate argumentele sunt anagrame și False în caz contrar.
-Exemplu: task_13('listen', 'silent') ➞ True
-Exemplu: task_13('hello', 'world') ➞ False
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_13(*arg):
-    # arr = list(arg)
-    # first = arr[0]
-    # second = arr[1]
-    # if (sorted(first) == sorted(second)):
-    #     return True
-    # else:
-    #     return False
     # CODUL TĂU VINE MAI SUS:
-    pass
 
     # VERIFICATION PROCESS
-print(session.check_task_13(task_13))
+print(session.check_task_2(user, Sistem))
 # VERIFICATION PROCESS
 
+# Task 3: Privatizarea
 """
-Task: Creați o funcție cu numele `task_14` care primește un argument `sub_string` de tip string și un număr variabil de argumente de tip string.
-Funcția va returna o listă cu toate argumentele care conțin `sub_string`.
-Exemplu: task_14('home', 'same', 'meme', sub_string="me") ➞ ['home', 'meme', 'same']
+Iar pe sfârșite a rămas ulimul element al sistemului nostru, vom aveae nevoie de o simulare a unei aplicații care va permite interacțiunea cu întregul sistem.
+
+Ce trebuie să faci:
+1. Creează o clasă `TechSolutionsApp` care va conține o valoare a clasei `versiune_applicatie` cu valoarea implicită "1.0".
+    Această clasă va avea nevoie de 3 metode, fiecare dintre acestea va fi utilizată pentru a simula interacțiunea cu sistemul nostru.
+    De asemenea clasa va primi ca argument la inițializare o valoare ce va reprezenta versiunea aplicatiei care va fi stocată în atributul `self.versiune_aplicatie`.
+
+    Metoda `market_view` va fi o metodă statică care nu va avea acces la self sau cls și va returna string-ul "Vizualizare piață".
+    Metoda `delogat_view` va fi o metodă de clasă care va avea acces la cls și va returna string-ul "Versiunea aplicației este *versiune-aplicatie*" utilizând atributul clasei.
+    Metoda `account_view` va fi o metodă de instanță care va avea acces la self și va returna string-ul "Vizualizare aplicație user *versiune-aplicatie*" utilizând atributul instanței.
 """
 
 # CODUL TĂU VINE MAI JOS:
 
 
-def task_14(*arg, **kwarg):
-    value = kwarg.get('sub_string')
-    res = [i for i in arg if value in i]
-    return res
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_14(task_14))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_15` care primește un argument `sub_string` de tip string și un număr variabil de argumente de tip string.
-Funcția va returna un dicționar cu două chei: `contains` și `not_contains`.
-Cheia `contains` va avea o listă cu toate argumentele care conțin `sub_string`, iar cheia `not_contains` va avea o listă cu toate argumentele care nu conțin `sub_string`.
-Exemplu: task_15('home', 'same', 'meme', sub_string = 'me') ➞ {'contains': ['home', 'same', 'meme'], 'not_contains': []}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_15(*arg, **kwarg):
-    value = kwarg.get('sub_string')
-    # contains = [i for i in arg if value in i]
-    # not_conatis = [i for i in arg if not value in i]
-    # res = {'contains': contains, 'not_contains': not_conatis}
-    res = {'contains': [i for i in arg if value in i],
-           'not_contains': [i for i in arg if not value in i]}
-    return res
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_15(task_15))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_16` care va primi un număr variabil de argumente de tip integer și un argument `ooperation` de tip string.
-Funcția va returna rezultatul operației specificate de argumentul `operation` aplicată tuturor argumentelor.
-Operațiile posibile sunt: `add`, `sub`, `mul`, `div`.
-Exemplu: task_16(2, 3, 4, 5, operation='add') ➞ 14
-Exemplu: task_16(2, 3, 4, 5, operation='sub') ➞ -10
-Exemplu: task_16(2, 3, 4, 5, operation='mul') ➞ 120
-Exemplu: task_16(2, 3, 4, 5, operation='div') ➞ 0.008333333333333333
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_16(*arg, **kwarg):
-    value = kwarg.get('operation')
-    arr = list(arg)
-
-    def add(arr):
-        res = 0
-        for i in arr:
-            res += i
-        return res
-
-    def sub(arr):
-        res = arr[0]
-        for i in range(len(arr)):
-            if i < len(arr)-1:
-                res = res - arr[i+1]
-        return res
-
-    def mul(arr):
-        res = 1
-        for i in arr:
-            res *= i
-        return res
-
-    def div(arr):
-        res = arr[0]
-        for i in range(len(arr)):
-            if i < len(arr)-1:
-                res = res / arr[i+1]
-        return res
-
-    if value == 'add':
-        add(arr)
-    if value == 'sub':
-        sub(arr)
-    if value == 'mul':
-        mul(arr)
-    if value == "div":
-        div(arr)
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_16(task_16))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_17` care primește un argument `number` după putea primi diferite argumente keyword precum `add`, `sub`, `mul`, `div` care vor fi liste cu numere.
-Funcția va returna rezultatul operației specificate de argumentul `operation` aplicată tuturor argumentelor. Mai multe operații pot fi aplicate. Ordinea operațiilor va fi în ordinea în care sunt specificate.
-Operațiile posibile sunt: `add`, `sub`, `mul`, `div`.
-Exemplu: task_17(2, add=[3, 4, 5]) ➞ 14
-Exemplu: task_17(2, sub=[3, 4, 5]) ➞ -10
-Exemplu: task_17(2, mul=[3, 4, 5]) ➞ 120
-Exemplu: task_17(2, div=[3, 4, 5]) ➞ 0.008333333333333333
-Exemplu: task_17(2, add=[3, 4, 5], sub=[1, 2]) ➞ 11
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_17():
+class TechSolutionsApp:
     pass
 # CODUL TĂU VINE MAI SUS:
 
 
 # VERIFICATION PROCESS
-print(session.check_task_17(task_17))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_18` care primește un număr variabil de argumente de tip string și va returna un dicționar în care cheile vor fi caracterele întâlnite în argumentele primite, iar valorile vor fi numărul de apariții ale caracterelor.
-Exemplu: task_18('hello', 'world') ➞ {'h': 1, 'e': 1, 'l': 3, 'o': 2, 'w': 1, 'r': 1, 'd': 1}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_18(*args):
-    character_counts = {}
-    for arg in args:
-        for char in arg:
-            if char in character_counts:
-                character_counts[char] += 1
-            else:
-                character_counts[char] = 1
-    return character_counts
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_18(task_18))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_19` care primește un număr variabil de argumente de tip integer și va returna un dicționar în care cheile vor fi numerele prime întâlnite în argumentele primite, iar valorile vor fi numărul de apariții ale numerelor prime.
-Exemplu: task_19(1, 2, 3, 4, 5, 6, 7, 8, 9) ➞ {2: 1, 3: 1, 5: 1, 7: 1}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_19(*args):
-    def is_prime(n):
-        if n < 2:
-            return False
-        for i in range(2, int(n**0.5) + 1):
-            if n % i == 0:
-                return False
-        return True
-
-    prime_counts = {}
-    for num in args:
-        if is_prime(num):
-            if num in prime_counts:
-                prime_counts[num] += 1
-            else:
-                prime_counts[num] = 1
-    return prime_counts
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_19(task_19))
-# VERIFICATION PROCESS
-
-"""
-Task: Creați o funcție cu numele `task_20` care primește un număr variabil de argumente de tip string și va returna un dicționar în care cheile vor fi lungimile cuvintelor întâlnite în argumentele primite, iar valorile vor fi numărul de apariții ale lungimilor cuvintelor.
-Exemplu: task_20('hello', 'world') ➞ {5: 2}
-Exemplu: task_20('hello', 'world', 'python') ➞ {5: 2, 6: 1}
-"""
-
-# CODUL TĂU VINE MAI JOS:
-
-
-def task_20():
-    pass
-# CODUL TĂU VINE MAI SUS:
-
-
-# VERIFICATION PROCESS
-print(session.check_task_20(task_20))
+print(session.check_task_3(TechSolutionsApp))
 print(session.get_completion_percentage())
 # VERIFICATION PROCESS
