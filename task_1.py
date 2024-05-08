@@ -52,14 +52,13 @@ class Utilizator:
         self._nivel_acces = "Default"
 
     def afiseaza_nivel_acces(self):
-        return f"{self.nume}are nivelul de acces {self._nivel_acces}."
+        return f"{self.nume} are nivelul de acces {self._nivel_acces}."
 
     def utilizeaza_sistem(self):
         return f"{self.nume} poate utiliza funcții de bază ale sistemului."
 
 
 class UtilizatorManager(Utilizator):
-
     def __init__(self, nume):
         super().__init__(nume)
         self._nivel_acces = "Manager"
@@ -113,9 +112,9 @@ Ce trebuie să faci:
 
 
 class user:
-    def __init__(self, nume):
+    def __init__(self, nume, nivel_acces="Default"):
         self._nume = nume
-        self.__nivel_acces = "Default2"
+        self.__nivel_acces = nivel_acces
 
     @property
     def nume(self):
@@ -139,30 +138,35 @@ class Sistem:
         self.__utilizatori = {}
 
     def adauga_utilizator(self, utilizator):
-        # Generăm un id unic pentru utilizator
         id_utilizator = len(self.__utilizatori) + 1
         self.__utilizatori[id_utilizator] = utilizator
 
     def afiseaza_utilizatori(self):
-        return [utilizator.get_nume() for utilizator in self.__utilizatori.values()]
+        return [utilizator.nume for utilizator in self.__utilizatori.values()]
 
     def verifica_nivel_acces(self, nume_utilizator):
         for utilizator in self.__utilizatori.values():
-            if utilizator.get_nume() == nume_utilizator:
-                return utilizator.get_nivel_acces()
-        return "Utilizatorul nu există"
+            if utilizator.nume == nume_utilizator:
+                return utilizator.nivel_acces
+        return "Utilizatorul nu există."
 
-    def modifica_nume_utilizator(self, id_utilizator, nume_nou):
+    def modifica_name_user(self, id_utilizator, nume_nou):
         if id_utilizator in self.__utilizatori:
-            self.__utilizatori[id_utilizator].set_nume(nume_nou)
+            self.__utilizatori[id_utilizator].nume = nume_nou
         else:
-            print("Utilizatorul nu există")
+            return "Utilizatorul nu există."
 
     def sterge_utilizator(self, id_utilizator):
         if id_utilizator in self.__utilizatori:
             del self.__utilizatori[id_utilizator]
         else:
-            print("Utilizatorul nu există")
+            return "Utilizatorul nu există."
+
+    def modifica_nivel_acces(self, id_utilizator, nivel_nou):
+        if id_utilizator in self.__utilizatori:
+            self.__utilizatori[id_utilizator].nivel_acces = nivel_nou
+        else:
+            return "Utilizatorul nu există."
 
     # CODUL TĂU VINE MAI SUS:
 
